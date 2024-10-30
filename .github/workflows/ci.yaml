@@ -1,43 +1,38 @@
-name: Docker CI
+name: CI Workflow
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch: 
 
 jobs:
-  docker-build-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout the code
+      uses: actions/checkout@v2
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      
-      - name: Build Docker image
-        run: docker build -t sasideva/node .
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with: 
+        username: ${{ secrets.DOCKER_USERNAME }}  
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      
-      - name: Run Docker container
-        run: docker run -d --rm --name test_container sasideva/node
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v3
+      with:
+        context: .  
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/node:latest 
 
-    
-      - name: Run tests
-        run: docker exec test_container npm test  
+    - name: Log out from Docker Hub
+      run: docker logout
 
-      
-      - name: Stop and remove Docker container
-        if: always()
-        run: |
-          docker stop test_container || true
-          docker rm test_container || true
+    - name: Notify Success
+      if: success() 
+      run: echo "Docker image has been built and pushed successfully!"
