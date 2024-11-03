@@ -1,0 +1,21 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - name: Pull Docker image
+      run: sudo docker pull sasideva/node:latest
+    - name: Delete Old docker container
+      run: sudo docker rm -f node || true
+    - name: Run Docker Container
+      run:  docker run -d -p 80:80 --name node sasideva/node:latest
