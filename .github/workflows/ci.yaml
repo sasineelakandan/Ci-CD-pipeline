@@ -1,4 +1,4 @@
-name: CICD Workflow
+name: CI Pipeline
 
 on:
   push:
