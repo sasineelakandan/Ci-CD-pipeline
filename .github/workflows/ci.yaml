@@ -48,6 +48,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
          ssh -i ec2_key.pem ubuntu@ec2-13-48-42-228.eu-north-1.compute.amazonaws.com
+
             docker pull ${{ secrets.DOCKER_USERNAME }}/node:latest
             docker stop node || true
             docker rm node || true
