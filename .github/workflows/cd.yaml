@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: Pull Docker image
       run: sudo docker pull sasideva/node:latest
+    - name: Stop Existing Docker Container
+      run: sudo docker stop node || true
     - name: Delete Old docker container
       run: sudo docker rm -f node || true
     - name: Run Docker Container
