@@ -37,16 +37,24 @@ jobs:
         if: success()
         run: echo "Docker image has been built and pushed successfully!"
 
+      - name: Setup SSH key for EC2
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem  # Use 600 instead of 400 for compatibility
+          
       - name: Deploy to EC2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > ec2_key.pem
-          chmod 400 ec2_key.pem
           ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@ec2-13-48-42-228.eu-north-1.compute.amazonaws.com << 'EOF'
+            # Pull the latest Docker image
             docker pull ${{ secrets.DOCKER_USERNAME }}/node:latest
+            
+            # Stop and remove any existing container
             docker stop node || true
             docker rm node || true
+            
+            # Run the new container
             docker run -d -p 80:80 --name node ${{ secrets.DOCKER_USERNAME }}/node:latest
           EOF
