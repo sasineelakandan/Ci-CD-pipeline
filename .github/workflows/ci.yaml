@@ -47,7 +47,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ubuntu@ec2-13-48-42-228.eu-north-1.compute.amazonaws.com << 'EOF'
+          ssh -i /home/deva/Downloads/mykey.pem ubuntu@ec2-13-48-42-228.eu-north-1.compute.amazonaws.com << 'EOF'
             # Pull the latest Docker image
             docker pull ${{ secrets.DOCKER_USERNAME }}/node:latest
             
